@@ -2,19 +2,22 @@
 prospectus_ai/
 ├── app/
 │   ├── templates/
-│   │   └── index.html         # Frontend HTML page
-│   ├── main.py                # Entry point (Flask or FastAPI app)
-│   └── routes.py              # API endpoint logic (e.g., /summarize)
+│   │   └── index.html          # Frontend HTML page
+│   ├── main.py                 # Entry point (Flask app creation)
+│   └── routes.py               # API endpoint logic (e.g., /summarize)
 │
 ├── core/
-│   ├── extractor.py           # PDF text extraction (pdfplumber, PyMuPDF/fitz)
-│   ├── parser.py              # Rule-based parsing and number/ratio regex
-│   ├── nlp.py                 # Named Entity Recognition & keyword spotting
-│   └── summarizer.py          # Automatic summarization (transformers, OpenAI)
+│   ├── extractor.py            # PDF text extraction (pdfplumber, fitz)
+│   ├── parser.py               # Rule-based parsing and regex for numbers/ratios
+│   ├── nlp.py                  # Named Entity Recognition & keyword spotting
+│   └── summarizer.py           # Automatic summarization (transformers, OpenAI)
 │
-├── requirements.txt           # Python dependencies
-├── .env                       # Environment variables (API keys, secrets)
-└── README.md                  # Project documentation
+├── .env                        # Environment variables (API keys, secrets)
+├── .gitattributes              # Git attributes (optional, for LFS or text settings)
+├── .gitignore                  # Files/folders to ignore in git
+├── requirements.txt            # Python dependencies
+├── README.md                   # Project documentation
+├── run.py                      # Production entry point (import from app.main)
 ```
 
 ---
