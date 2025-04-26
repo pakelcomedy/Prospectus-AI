@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prospektus Saham AI</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --card-bg: #1e1e1e;
+      --text: #e0e0e0;
+      --muted: #888;
+      --accent: #d32f2f;
+      --radius: 8px;
+      --transition: 0.3s ease;
+    }
+    * {
+      box-sizing: border-box;
+      transition: background var(--transition), color var(--transition);
+    }
+    body {
+      margin: 0;
+      padding: 2em;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    h1 {
+      margin-bottom: 0.5em;
+      font-size: 2rem;
+      text-align: center;
+    }
+    .card {
+      background: var(--card-bg);
+      padding: 2em;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 480px;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+    .controls {
+      display: flex;
+      gap: 0.5em;
+      align-items: center;
+    }
+    input[type="file"] {
+      color: var(--text);
+      border: 1px dashed var(--muted);
+      padding: 1em;
+      border-radius: var(--radius);
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="file"]::file-selector-button {
+      background: var(--accent);
+      border: none;
+      color: white;
+      padding: 0.6em 1.2em;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: bold;
+    }
+    select, button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.6em 1em;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    select {
+      flex: 1;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    #output {
+      margin-top: 1.5em;
+      background: #212121;
+      padding: 1em;
+      border-radius: var(--radius);
+      max-height: 60vh;
+      width: 100%;
+      overflow-y: auto;
+      font-family: Consolas, monospace;
+      color: #cfcfcf;
+    }
+    .loading {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      border: 2px solid var(--text);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-left: 0.5em;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 480px) {
+      body { padding: 1em; }
+      .card { padding: 1.5em; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Prospektus Saham AI</h1>
+  <div class="card">
+    <p style="color: var(--muted); text-align: center;">
+      Upload PDF prospektus saham Anda untuk ringkasan otomatis.
+    </p>
+    <form id="uploadForm">
+      <input type="file" id="pdfFile" accept="application/pdf" required />
+      <div class="controls">
+        <select id="format">
+          <option value="pdf">PDF</option>
+          <option value="json">JSON</option>
+        </select>
+        <button type="submit">Upload &amp; Summarize</button>
+      </div>
+    </form>
+    <div id="output">Hasil ringkasan akan muncul di sini.</div>
+  </div>
+
+  <script>
+    const form = document.getElementById("uploadForm"),
+          fileInput = document.getElementById("pdfFile"),
+          formatSelect = document.getElementById("format"),
+          output = document.getElementById("output");
+
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      form.querySelector("button").disabled = true;
+      output.innerHTML = 'Memproses<span class="loading"></span>';
+
+      const formData = new FormData();
+      formData.append("file", file);
+      const fmt = formatSelect.value;
+
+      try {
+        const resp = await fetch(`/summarize?format=${encodeURIComponent(fmt)}`, {
+          method: "POST",
+          headers: fmt === "json" ? { "Accept": "application/json" } : { "Accept": "application/pdf" },
+          body: formData
+        });
+
+        const contentType = resp.headers.get("Content-Type") || "";
+
+        if (!resp.ok) {
+          const text = await resp.text();
+          output.textContent = `Error (${resp.status}):\n${text}`;
+        } else if (contentType.includes("application/pdf")) {
+          // PDF response → render inline + provide download link
+          const blob = await resp.blob();
+          const url = URL.createObjectURL(blob);
+          output.innerHTML = `
+            <div style="text-align:center;">
+              <a href="${url}" download="summary.pdf" style="color: var(--accent);">
+                &#128190; Download PDF
+              </a>
+            </div>
+            <iframe src="${url}" style="width:100%; height:60vh; border:none; margin-top:1em;"></iframe>
+          `;
+        } else {
+          // JSON or text response
+          const text = await resp.text();
+          try {
+            const data = JSON.parse(text);
+            output.textContent = JSON.stringify(data, null, 2);
+          } catch {
+            output.textContent = text;
+          }
+        }
+      } catch (err) {
+        output.textContent = "Kesalahan jaringan: " + err.message;
+      } finally {
+        form.querySelector("button").disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

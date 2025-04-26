@@ -1,0 +1,13 @@
+flask
+pdfplumber
+spacy
+transformers
+torch
+scikit-learn
+rake-nltk
+flashtext
+rapidfuzz
+tiktoken
+PyMuPDF
+pdf2image
+pytesseract
