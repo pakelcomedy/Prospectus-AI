@@ -1,31 +1,20 @@
 ```
 prospectus_ai/
 ├── app/
-│   ├── main.py               # Entry point (Flask / FastAPI API handler)
-│   ├── routes.py             # Endpoint logic (misal /summarize)
-│   └── config.py             # API keys, model paths, env vars
+│   ├── templates/
+│   │   └── index.html         # Frontend HTML page
+│   ├── main.py                # Entry point (Flask or FastAPI app)
+│   └── routes.py              # API endpoint logic (e.g., /summarize)
 │
 ├── core/
-│   ├── extractor.py          # Ekstraksi teks PDF (pdfplumber / fitz)
-│   ├── parser.py             # Rule-based parsing dan regex angka/rasio
-│   ├── nlp.py                # Named Entity Recognition + keyword spotting
-│   ├── summarizer.py         # Ringkasan otomatis (transformers / OpenAI)
+│   ├── extractor.py           # PDF text extraction (pdfplumber, PyMuPDF/fitz)
+│   ├── parser.py              # Rule-based parsing and number/ratio regex
+│   ├── nlp.py                 # Named Entity Recognition & keyword spotting
+│   └── summarizer.py          # Automatic summarization (transformers, OpenAI)
 │
-├── data/
-│   ├── sample.pdf            # Contoh dokumen PDF prospektus
-│   └── output.json           # Output hasil ekstraksi/summarization
-│
-├── models/
-│   └── ner_model/            # Optional: model spaCy custom untuk keuangan
-│
-├── tests/
-│   ├── test_extractor.py
-│   ├── test_parser.py
-│   ├── test_summarizer.py
-│
-├── requirements.txt
-├── .env                      # API Key / secrets
-└── README.md
+├── requirements.txt           # Python dependencies
+├── .env                       # Environment variables (API keys, secrets)
+└── README.md                  # Project documentation
 ```
 
 ---
